@@ -5,7 +5,8 @@ import pygame
 import requests
 
 coords = input("Введите координаты через запятую (к примеру 134.13,-24.47): ")
-map_request = f"https://static-maps.yandex.ru/1.x/?ll={coords}&spn=22,22&l=sat"
+scale = input("Введите уровень масштабирования карты от 0 до 21: ")
+map_request = f"https://static-maps.yandex.ru/1.x/?ll={coords}&z={scale}&l=sat"
 response = requests.get(map_request)
 
 if not response:
