@@ -4,14 +4,20 @@ import sys
 import pygame
 import requests
 
-coords = input("Введите координаты через запятую (к примеру 134.13,-24.47): ")
-scale = input("Введите уровень масштабирования карты от 0 до 21: ")
-map_request = f"https://static-maps.yandex.ru/1.x/?ll={coords}&z={scale}&l=sat"
-response = requests.get(map_request)
+coords = "28.97709,41.005233" # input("Введите координаты через запятую (к примеру 134.13,-24.47): ")
+scale = "4" # input("Введите уровень масштабирования карты от 0 до 21: ")
+map_request = "https://static-maps.yandex.ru/1.x/"
+map_params = {
+    "ll": "134.13992626725712,-24.478902738123082",
+    "spn": "50,50",
+    "lang": "ru_RU",
+    "l": "sat",
+}
+response = requests.get(map_request, params=map_params)
 
 if not response:
     print("Ошибка выполнения запроса:")
-    print(map_request)
+    print(response.url)
     print("Http статус:", response.status_code, "(", response.reason, ")")
     sys.exit(1)
 
