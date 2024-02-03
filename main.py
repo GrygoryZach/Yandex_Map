@@ -20,7 +20,7 @@ def main() -> None:
 
     map_view = MapView()
 
-    tutorial = font.Font.render(font.Font(None, 20), "Пример ввода координат(y,x): 50.2121331,34.123444", 1, "black")
+    tutorial = font.Font.render(font.Font(None, 20), "Пример ввода координат(долгота, широта): 50.2121331,34.123444", 1, "black")
 
     while running:
         screen.fill("white")
