@@ -26,7 +26,7 @@ class MapView(sprite.Sprite):
         self.static_api_params = {
             "ll": "{0},{1}".format(*self.yx),
             "z": str(self.zoom),
-            "l": "map" # "sat", "sat,skl"
+            "l": "map"
         }
 
         self.do_request()
@@ -47,9 +47,8 @@ class MapView(sprite.Sprite):
                 new_y += change
 
         self.yx = new_y, new_x
-        print(self.yx)
         self.static_api_params["ll"] = "{0},{1}".format(*self.yx)
-        self.update()
+        self.do_request()
 
     def scale(self, scale: Literal["inc", "dec"]) -> None:
         match scale:
