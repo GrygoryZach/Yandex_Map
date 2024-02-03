@@ -46,3 +46,11 @@ class MapView(sprite.Sprite):
         self.image = image.load(BytesIO(response.content))
         self.rect = self.image.get_rect()
 
+    def set_coords(self, coords: Tuple[float, float]) -> None:
+        if -90 <= coords[0] <= 90 and -180 <= coords[1] <= 180:
+            self.yx = coords
+            self.static_api_params["ll"] = "{0},{1}".format(*self.yx)
+            response = get(self.static_api_server, params=self.static_api_params)
+            self.image = image.load(BytesIO(response.content))
+            self.rect = self.image.get_rect()
+
