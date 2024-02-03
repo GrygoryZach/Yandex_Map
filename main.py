@@ -2,7 +2,7 @@ from pygame import init as pginit
 from pygame import display
 from pygame import event as pgevent
 from pygame import QUIT, KEYDOWN, K_PAGEUP, K_PAGEDOWN, K_RETURN
-from pygame import sprite
+from pygame import font
 
 from map_view import MapView
 
@@ -12,13 +12,15 @@ from pygame_textinput import TextInputVisualizer
 def main() -> None:
     pginit()
     
-    size = 600, 500
+    size = 600, 520
     screen = display.set_mode(size)
     running = True
 
     textinput = TextInputVisualizer()
 
     map_view = MapView()
+
+    tutorial = font.Font.render(font.Font(None, 20), "Пример ввода координат(y,x): 50.2121331,34.123444", 1, "black")
 
     while running:
         screen.fill("white")
@@ -42,8 +44,9 @@ def main() -> None:
                     except TypeError:
                         pass
         
-        screen.blit(map_view.image, (0,50))
-        screen.blit(textinput.surface, (5, 5))
+        screen.blit(map_view.image, (0,70))
+        screen.blit(tutorial, (5, 5))
+        screen.blit(textinput.surface, (5, 25))
         display.flip()
 
 
