@@ -1,22 +1,32 @@
-from pygame import init as pginit
+from pygame import init as pginit, sprite
 from pygame import display
 from pygame import event as pgevent
-from pygame import QUIT, KEYDOWN, K_PAGEUP, K_PAGEDOWN, K_RETURN
+from pygame import QUIT, KEYDOWN, K_PAGEUP, K_PAGEDOWN, K_RETURN, MOUSEBUTTONDOWN
 from pygame import font
 
-from map_view import MapView
+from map_view import MapView, Button
 
 from pygame_textinput import TextInputVisualizer
 
 
 def main() -> None:
+
+    def set_map_veiw(map: MapView, key: str, val: str):
+        map.static_api_params[key] = val
+        map.do_request()
+
     pginit()
     
-    size = 600, 520
+    size = 700, 520
     screen = display.set_mode(size)
     running = True
 
     textinput = TextInputVisualizer()
+
+    button_group = sprite.Group()
+    map_button = Button("data/assets/map.png", "map", (650, 100), button_group)
+    sat_button = Button("data/assets/sat.png", "sat", (650, 150), button_group)
+    sat_skl_button = Button("data/assets/sat_skl.png", "sat,skl", (650, 200), button_group)
 
     map_view = MapView()
 
@@ -43,10 +53,15 @@ def main() -> None:
                         pass
                     except TypeError:
                         pass
+            if event.type == MOUSEBUTTONDOWN:
+                for i in button_group:
+                    if i.rect.collidepoint(event.pos):
+                        i.action(set_map_veiw, map_view, "l", i.label)
         
         screen.blit(map_view.image, (0,70))
         screen.blit(tutorial, (5, 5))
         screen.blit(textinput.surface, (5, 25))
+        button_group.draw(screen)
         display.flip()
 
 
