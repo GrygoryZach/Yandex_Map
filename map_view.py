@@ -6,14 +6,14 @@ from io import BytesIO
 
 
 class MapView(sprite.Sprite):
-    def __init__(self, init_coords: Tuple[float, float] = (37.677751, 55.757718), init_spn: Tuple[float, float] = (0.016457,0.00619), *groups: sprite.Group) -> None:
+    def __init__(self, init_coords: Tuple[float, float] = (37.677751, 55.757718), init_zoom: int = 9, *groups: sprite.Group) -> None:
         super().__init__(*groups)
         self.yx = init_coords
-        self.spn = init_spn
-        self.static_api_server = "http://static-maps.yandex.ru/1.x/"
+        self.zoom = init_zoom
+        self.static_api_server = "https://static-maps.yandex.ru/1.x/"
         self.static_api_params = {
             "ll": "{0},{1}".format(*self.yx),
-            "spn": "{0},{1}".format(*self.spn),
+            "z": str(self.zoom),
             "l": "map",
         }
 
@@ -34,16 +34,14 @@ class MapView(sprite.Sprite):
                 new_x += 1
     
     def scale(self, scale: Literal["inc", "dec"]) -> None:
-        new_spn_y, new_spn_x = self.spn
         match scale:
             case "inc":
-                new_spn_x += 10
-                new_spn_y += 10
+                if 0 <= self.zoom + 1 <= 21:
+                    self.zoom += 1
             case "dec":
-                new_spn_x -= 10
-                new_spn_y -= 10
-        self.spn = new_spn_y, new_spn_x
-        self.static_api_params["spn"] = "{0},{1}".format(*self.spn)
+                if 0 <= self.zoom - 1 <= 21:
+                    self.zoom -= 1
+        self.static_api_params["z"] = str(self.zoom)
         response = get(self.static_api_server, params=self.static_api_params)
         self.image = image.load(BytesIO(response.content))
         self.rect = self.image.get_rect()
