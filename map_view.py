@@ -43,14 +43,15 @@ class MapView(sprite.Sprite):
         self.static_api_params = {
             "ll": "{0},{1}".format(*self.yx),
             "z": str(self.zoom),
-            "l": "map"
+            "l": "map",
+            "pt": ""
         }
 
         self.do_request()
 
     def move(self, direction: Literal["up", "down", "left", "right"]) -> None:
         new_y, new_x = self.yx
-        change = 360 / (2 ** self.zoom)
+        change = 200 / (2 ** self.zoom)
         match direction:
             case "up":
                 if new_x + change < 100:
@@ -82,6 +83,8 @@ class MapView(sprite.Sprite):
         if crds:
             self.yx = crds
             self.static_api_params["ll"] = "{0},{1}".format(*self.yx)
+            self.static_api_params["pt"] = "{0},{1}".format(*self.yx)
+
             self.do_request()
 
     def do_request(self) -> None:
