@@ -16,6 +16,23 @@ class Button(sprite.Sprite):
         act(*args)
 
 
+def coords(name):
+    geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
+                       f"&geocode={name}" \
+                       f"&format=json"
+    response = get(geocoder_request)
+    if response:
+        json_response = response.json()
+        ans = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
+            "GeoObject"]["Point"]["pos"]
+        return tuple(map(float, ans.split()))
+    else:
+        print("Ошибка выполнения запроса:")
+        print(geocoder_request)
+        print("Http статус:", response.status_code, "(", response.reason, ")")
+        return None
+
+
 class MapView(sprite.Sprite):
     def __init__(self, init_coords: Tuple[float, float] = (37.677751, 55.757718), init_zoom: int = 4,
                  *groups: sprite.Group) -> None:
@@ -61,9 +78,9 @@ class MapView(sprite.Sprite):
         self.static_api_params["z"] = str(self.zoom)
         self.do_request()
 
-    def set_coords(self, coords: Tuple[float, float]) -> None:
-        if -180 <= coords[0] <= 180 and -90 <= coords[1] <= 90:
-            self.yx = coords
+    def search_request(self, crds: Tuple[float, float]) -> None:
+        if crds:
+            self.yx = crds
             self.static_api_params["ll"] = "{0},{1}".format(*self.yx)
             self.do_request()
 

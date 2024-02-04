@@ -6,19 +6,18 @@ from pygame import font
 from pygame import QUIT, KEYDOWN, K_PAGEUP, K_PAGEDOWN, K_UP, K_DOWN, K_LEFT, K_RIGHT
 from pygame import sprite
 
-from map_view import MapView, Button
+from map_view import MapView, Button, coords
 
 from pygame_textinput import TextInputVisualizer
 
 
 def main() -> None:
-
     def set_map_veiw(map: MapView, key: str, val: str):
         map.static_api_params[key] = val
         map.do_request()
 
     pginit()
-    
+
     size = 700, 520
     screen = display.set_mode(size)
     running = True
@@ -32,7 +31,7 @@ def main() -> None:
 
     map_view = MapView()
 
-    tutorial = font.Font.render(font.Font(None, 20), "Пример ввода координат(долгота, широта): 50.2121331,34.123444", 1, "black")
+    tutorial = font.Font.render(font.Font(None, 20), "Введите запрос: ", 1, "black")
 
     while running:
         screen.fill("white")
@@ -58,7 +57,8 @@ def main() -> None:
                     map_view.move("right")
                 if event.key == K_RETURN:
                     try:
-                        map_view.set_coords(tuple(map(float, textinput.value.split(','))))
+                        co = coords(textinput.value)
+                        map_view.search_request(co)
                     except ValueError:
                         pass
                     except TypeError:
@@ -67,8 +67,8 @@ def main() -> None:
                 for i in button_group:
                     if i.rect.collidepoint(event.pos):
                         i.action(set_map_veiw, map_view, "l", i.label)
-        
-        screen.blit(map_view.image, (0,70))
+
+        screen.blit(map_view.image, (0, 70))
         screen.blit(tutorial, (5, 5))
         screen.blit(textinput.surface, (5, 25))
         button_group.draw(screen)
@@ -77,5 +77,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
