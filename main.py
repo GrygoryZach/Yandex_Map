@@ -32,7 +32,7 @@ def main() -> None:
 
     map_view = MapView()
 
-    tutorial = font.Font.render(font.Font(None, 20), "Введите запрос: ", 1, "black")
+    tutorial = font.Font.render(font.Font(None, 20), "Введите запрос:", False, "black")
 
     while running:
         screen.fill("white")
@@ -58,8 +58,10 @@ def main() -> None:
                     map_view.move("right")
                 if event.key == K_RETURN:
                     try:
-                        co = coords(textinput.value)
+                        cor_req = coords(textinput.value)
+                        co = cor_req[0]
                         map_view.search_request(co)
+                        tutorial = font.Font.render(font.Font(None, 20), cor_req[1], False, "black")
                     except ValueError:
                         pass
                     except TypeError:
@@ -71,6 +73,7 @@ def main() -> None:
                             map_view.static_api_params["pt"] = ""
                             textinput.value = ""
                             map_view.do_request()
+                            tutorial = font.Font.render(font.Font(None, 20), "Введите запрос:", False, "black")
                         else:
                             i.action(set_map_veiw, map_view, "l", i.label)
 

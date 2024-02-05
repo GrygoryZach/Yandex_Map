@@ -6,10 +6,10 @@ from io import BytesIO
 
 
 class Button(sprite.Sprite):
-    def __init__(self, image: str, label: str, coords: Tuple[int, int], *groups: sprite.Group) -> None:
+    def __init__(self, image: str, label: str, cords: Tuple[int, int], *groups: sprite.Group) -> None:
         super().__init__(*groups)
         self.image = pgimage.load(image)
-        self.rect = self.image.get_rect(center=coords)
+        self.rect = self.image.get_rect(center=cords)
         self.label = label
 
     def action(self, act: Callable, *args):
@@ -25,7 +25,10 @@ def coords(name):
         json_response = response.json()
         ans = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
             "GeoObject"]["Point"]["pos"]
-        return tuple(map(float, ans.split()))
+        toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+        toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+        # post_index = toponym["metaDataProperty"]["GeocoderMetaData"]['Address']['postal_code']
+        return tuple(map(float, ans.split())), f"{toponym_address}"
     else:
         print("Ошибка выполнения запроса:")
         print(geocoder_request)
@@ -84,7 +87,6 @@ class MapView(sprite.Sprite):
             self.yx = crds
             self.static_api_params["ll"] = "{0},{1}".format(*self.yx)
             self.static_api_params["pt"] = "{0},{1}".format(*self.yx)
-
             self.do_request()
 
     def do_request(self) -> None:
