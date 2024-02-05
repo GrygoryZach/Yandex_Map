@@ -28,6 +28,7 @@ def main() -> None:
     map_button = Button("data/assets/map.png", "map", (650, 100), button_group)
     sat_button = Button("data/assets/sat.png", "sat", (650, 150), button_group)
     sat_skl_button = Button("data/assets/sat_skl.png", "sat,skl", (650, 200), button_group)
+    reset_button = Button("data/assets/reset.png", "reset", (620, 30), button_group)
 
     map_view = MapView()
 
@@ -66,7 +67,12 @@ def main() -> None:
             if event.type == MOUSEBUTTONDOWN:
                 for i in button_group:
                     if i.rect.collidepoint(event.pos):
-                        i.action(set_map_veiw, map_view, "l", i.label)
+                        if i.label == "reset":
+                            map_view.static_api_params["pt"] = ""
+                            textinput.value = ""
+                            map_view.do_request()
+                        else:
+                            i.action(set_map_veiw, map_view, "l", i.label)
 
         screen.blit(map_view.image, (0, 70))
         screen.blit(tutorial, (5, 5))
