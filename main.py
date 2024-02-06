@@ -159,7 +159,8 @@ def main() -> None:
                         if i.label == "reset":
                             map_view.static_api_params["pt"] = ""
                             address_box.text = ""
-                            # postcode_box.text = ""
+                            address_box.txt_surface = FONT.render("", True, address_box.color)
+                            postcode = ""
                             map_view.do_request()
                             tutorial = font.Font.render(font.Font(None, 20), "Введите запрос:", False, "black")
                         else:
