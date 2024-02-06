@@ -1,3 +1,4 @@
+from cProfile import label
 from typing import Tuple
 from pygame import init as pginit, sprite
 from pygame import display
@@ -25,14 +26,20 @@ FONT = font.Font(None, 32)
 class Switcher:
     def __init__(self, coords: Tuple[int, int]) -> None:
         self.item = Surface((40, 40))
+        self.rect = self.item.get_rect(topleft=coords)
         self.clicked = False
         self.color = False
         self.coords = coords
+        self.n = 0
+        self.label = ""
+        self.label2 = ""
 
     def handle_event(self, event: pgevent.Event):
-        if event.type == MOUSEBUTTONDOWN:
+        if event.type == MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
             if not self.clicked:
                 self.color = not self.color
+                self.clicked = True
+                self.n = not self.n
         if event.type == MOUSEBUTTONUP:
             self.clicked = False
 
@@ -95,19 +102,20 @@ def main() -> None:
     running = True
 
     address_box = InputBox(10, 30, 400, 30)
-    postcode_box = InputBox(20, 522, 400, 30)
+    # postcode_box = InputBox(20, 522, 400, 30)
 
     button_group = sprite.Group()
     map_button = Button("data/assets/map.png", "map", (650, 100), button_group)
     sat_button = Button("data/assets/sat.png", "sat", (650, 150), button_group)
     sat_skl_button = Button("data/assets/sat_skl.png", "sat,skl", (650, 200), button_group)
-    reset_button = Button("data/assets/sat.png", "reset", (620, 30), button_group)
+    reset_button = Button("data/assets/reset.png", "reset", (620, 30), button_group)
     
     switcher = Switcher((600, 500))
 
     map_view = MapView()
 
     tutorial = font.Font.render(font.Font(None, 20), "Введите запрос:", False, "black")
+    postcode = ""
 
     while running:
         screen.fill("white")
@@ -115,8 +123,9 @@ def main() -> None:
 
 
         for event in events:
-            postcode_box.handle_event(event)
+            # postcode_box.handle_event(event)
             address_box.handle_event(event)
+            switcher.handle_event(event)
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN:
@@ -134,11 +143,12 @@ def main() -> None:
                     map_view.move("right")
                 if event.key == K_RETURN:
                     try:
-                        address = address_box.text + ", " + postcode_box.text
+                        address = address_box.text
                         cor_req = coords(address.strip())
                         co = cor_req[0]
                         map_view.search_request(co)
                         tutorial = font.Font.render(font.Font(None, 20), cor_req[1], False, "black")
+                        postcode = cor_req[2]
                     except ValueError:
                         pass
                     except TypeError:
@@ -149,7 +159,7 @@ def main() -> None:
                         if i.label == "reset":
                             map_view.static_api_params["pt"] = ""
                             address_box.text = ""
-                            postcode_box.text = ""
+                            # postcode_box.text = ""
                             map_view.do_request()
                             tutorial = font.Font.render(font.Font(None, 20), "Введите запрос:", False, "black")
                         else:
@@ -159,8 +169,10 @@ def main() -> None:
         screen.blit(tutorial, (5, 5))
         button_group.draw(screen)
         address_box.draw(screen)
-        postcode_box.draw(screen)
+        if switcher.n:
+            screen.blit(font.Font.render(font.Font(None, 20), postcode, False, "black"), (400, 520))
         switcher.draw(screen)
+        screen.blit(font.Font.render(font.Font(None, 20), "postcode", False, "black"), (600, 480))
         display.flip()
 
 

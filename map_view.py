@@ -30,8 +30,12 @@ def coords(name: str):
             "GeoObject"]["Point"]["pos"]
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
-        # post_index = toponym["metaDataProperty"]["GeocoderMetaData"]['Address']['postal_code']
-        return tuple(map(float, ans.split())), f"{toponym_address}"
+        print(response.url)
+        try:
+            post_index = toponym["metaDataProperty"]["GeocoderMetaData"]['Address']['postal_code']
+        except:
+            post_index = ''
+        return (tuple(map(float, ans.split())), f"{toponym_address}", post_index)
     else:
         print("Ошибка выполнения запроса:")
         print(geocoder_request)
@@ -52,6 +56,8 @@ class MapView(sprite.Sprite):
             "l": "map",
             "pt": ""
         }
+
+        self.current_postcode = ""
 
         self.do_request()
 
