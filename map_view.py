@@ -16,11 +16,14 @@ class Button(sprite.Sprite):
         act(*args)
 
 
-def coords(name):
-    geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
-                       f"&geocode={name}" \
-                       f"&format=json"
-    response = get(geocoder_request)
+def coords(name: str):
+    geocoder_request = f"http://geocode-maps.yandex.ru/1.x/"
+    params = {
+        "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+        "geocode": name,
+        "format": "json"
+    }
+    response = get(geocoder_request, params=params)
     if response:
         json_response = response.json()
         ans = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
