@@ -112,7 +112,7 @@ def main() -> None:
     
     switcher = Switcher((600, 500))
 
-    map_view = MapView()
+    map_view = MapView((0, 70))
 
     tutorial = font.Font.render(font.Font(None, 20), "Введите запрос:", False, "black")
     postcode = ""
@@ -154,6 +154,10 @@ def main() -> None:
                     except TypeError:
                         pass
             if event.type == MOUSEBUTTONDOWN:
+                if map_view.rect.collidepoint(event.pos):
+                    cor_req = map_view.set_point(*event.pos)
+                    tutorial = font.Font.render(font.Font(None, 20), cor_req[1], False, "black")
+                    postcode = cor_req[2]
                 for i in button_group:
                     if i.rect.collidepoint(event.pos):
                         if i.label == "reset":
@@ -166,7 +170,7 @@ def main() -> None:
                         else:
                             i.action(set_map_veiw, map_view, "l", i.label)
 
-        screen.blit(map_view.image, (0, 70))
+        screen.blit(map_view.image, map_view.rect)
         screen.blit(tutorial, (5, 5))
         button_group.draw(screen)
         address_box.draw(screen)

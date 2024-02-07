@@ -3,6 +3,7 @@ from pygame import sprite
 from pygame import image as pgimage
 from requests import get
 from io import BytesIO
+from math import cos, radians
 
 
 class Button(sprite.Sprite):
@@ -44,7 +45,7 @@ def coords(name: str):
 
 
 class MapView(sprite.Sprite):
-    def __init__(self, init_coords: Tuple[float, float] = (37.677751, 55.757718), init_zoom: int = 4,
+    def __init__(self, window_loc: Tuple[int, int], init_coords: Tuple[float, float] = (37.677751, 55.757718), init_zoom: int = 4,
                  *groups: sprite.Group) -> None:
         super().__init__(*groups)
         self.yx = init_coords
@@ -56,6 +57,7 @@ class MapView(sprite.Sprite):
             "l": "map",
             "pt": ""
         }
+        self.window_loc = window_loc
 
         self.current_postcode = ""
 
@@ -101,4 +103,17 @@ class MapView(sprite.Sprite):
     def do_request(self) -> None:
         response = get(self.static_api_server, params=self.static_api_params)
         self.image = pgimage.load(BytesIO(response.content))
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect(topleft=self.window_loc)
+
+    def set_point(self, x: int, y: int):
+        dx = x - 300
+        dy = 255 - y + 35
+        curr_lon, curr_lat = map(float, self.static_api_params["ll"].split(','))
+        # coord_to_geo_x, coord_to_geo_y = 0.0000428, 0.0000428
+        new_lon = curr_lon + dx * 360 / (2 ** (8 + self.zoom)) # * coord_to_geo_x * 2 ** (15 - self.zoom)
+        new_lat = curr_lat + dy * 180 / (2 ** (8 + self.zoom)) # * coord_to_geo_y * cos(radians(curr_lat)) * 2 ** (15 - self.zoom)
+        self.static_api_params["ll"] = "{0},{1}".format(new_lon, new_lat)
+        self.static_api_params["pt"] = "{0},{1}".format(new_lon, new_lat)
+        self.do_request()
+        return coords(self.static_api_params["ll"])
+
