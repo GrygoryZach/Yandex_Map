@@ -116,4 +116,27 @@ class MapView(sprite.Sprite):
         self.static_api_params["pt"] = "{0},{1}".format(new_lon, new_lat)
         self.do_request()
         return coords(self.static_api_params["ll"])
+    
+    def found_organization(self):
+        search_api_service = "https://search-maps.yandex.ru/v1/"
+        search_api_params = {
+            "apikey": "dda3ddba-c9ea-4ead-9010-f43fbc15c6e3",
+            "text": ','.join(self.static_api_params["ll"].split(',')[::-1]),
+            "lang": "ru-RU",
+            "type": "biz"
+        }
+        response = get(search_api_service, params=search_api_params)
+        if response:
+            print(response.url)
+            json_resp = response.json()
+            obj_geometry = json_resp["features"][0]["geometry"]["coordinates"]
+            lon, lat = obj_geometry
+            curr_lat, curr_lon = map(float, self.static_api_params["ll"].split(','))
+            dx = (lon - curr_lon) * 111
+            dy = (lat - curr_lat) * 111
+            if (dx ** 2 + dy ** 2) ** 0.5 <= 50:
+                obj = json_resp["features"][0]["properties"]
+                return obj["name"] + ', ' + obj["description"]
+
+            return None
 

@@ -158,6 +158,12 @@ def main() -> None:
                     cor_req = map_view.set_point(*event.pos)
                     tutorial = font.Font.render(font.Font(None, 20), cor_req[1], False, "black")
                     postcode = cor_req[2]
+                    print(event.button)
+                    if event.button == 3:
+                        res = map_view.found_organization()
+                        if res:
+                            print(res)
+                            tutorial = font.Font.render(font.Font(None, 20), res, False, "black")
                 for i in button_group:
                     if i.rect.collidepoint(event.pos):
                         if i.label == "reset":
