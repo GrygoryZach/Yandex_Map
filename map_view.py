@@ -118,25 +118,37 @@ class MapView(sprite.Sprite):
         return coords(self.static_api_params["ll"])
     
     def found_organization(self):
+        geocoder_api_service = "http://geocode-maps.yandex.ru/1.x/"
+        geocoder_api_params = {
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "geocode": self.static_api_params["ll"],
+            "format": "json"
+        }
+        response = get(geocoder_api_service, params=geocoder_api_params)
+        if not response:
+            return None
+        obj = response.json()["response"]["GeoObjectCollection"]["featureMember"][0] \
+                ["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"]
         search_api_service = "https://search-maps.yandex.ru/v1/"
         search_api_params = {
             "apikey": "dda3ddba-c9ea-4ead-9010-f43fbc15c6e3",
-            "text": ','.join(self.static_api_params["ll"].split(',')[::-1]),
+            "text": obj,
             "lang": "ru-RU",
             "type": "biz"
         }
         response = get(search_api_service, params=search_api_params)
         if response:
-            print(response.url)
             json_resp = response.json()
-            obj_geometry = json_resp["features"][0]["geometry"]["coordinates"]
-            lon, lat = obj_geometry
-            curr_lat, curr_lon = map(float, self.static_api_params["ll"].split(','))
-            dx = (lon - curr_lon) * 111
-            dy = (lat - curr_lat) * 111
-            if (dx ** 2 + dy ** 2) ** 0.5 <= 50:
-                obj = json_resp["features"][0]["properties"]
-                return obj["name"] + ', ' + obj["description"]
+
+            for i in json_resp["features"]:
+                obj_geometry = i["geometry"]["coordinates"]
+                lon, lat = obj_geometry
+                curr_lon, curr_lat = map(float, self.static_api_params["ll"].split(','))
+                dx = (lon - curr_lon) * 111 * 1000
+                dy = (lat - curr_lat) * 111 * 1000
+                obj = i["properties"]
+                if (dx ** 2 + dy ** 2) ** 0.5 <= 50:
+                    return obj["name"] + ', ' + obj["description"]
 
             return None
 
